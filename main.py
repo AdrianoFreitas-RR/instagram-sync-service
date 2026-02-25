@@ -18,6 +18,8 @@ class SyncResponse(BaseModel):
     profile: dict
     posts: list[dict]
 
+import random
+
 L = instaloader.Instaloader(
     download_pictures=False,
     download_videos=False,
@@ -26,10 +28,19 @@ L = instaloader.Instaloader(
     quiet=True
 )
 
+proxies_list = [
+    {'http': 'http://proxylab:U7tS9j2Q@us.proxylab.com:8000', 'https': 'http://proxylab:U7tS9j2Q@us.proxylab.com:8000'},
+    {'http': 'http://proxylab:U7tS9j2Q@uk.proxylab.com:8000', 'https': 'http://proxylab:U7tS9j2Q@uk.proxylab.com:8000'},
+    {'http': 'http://proxylab:U7tS9j2Q@de.proxylab.com:8000', 'https': 'http://proxylab:U7tS9j2Q@de.proxylab.com:8000'},
+]
+
 @app.post("/sync", response_model=SyncResponse)
 async def sync_instagram(request: SyncRequest):
     username = request.username.strip().lstrip('@')
     try:
+        selected_proxy = random.choice(proxies_list)
+        L.context.proxy = selected_proxy
+        logger.info(f"Using proxy: {selected_proxy}")
         logger.info(f"Syncing public profile: {username} for user {request.user_id}")
 
         profile = instaloader.Profile.from_username(L.context, username)
