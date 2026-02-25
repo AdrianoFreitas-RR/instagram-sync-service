@@ -28,20 +28,29 @@ L = instaloader.Instaloader(
     quiet=True
 )
 
-proxies_list = [
-    {'http': 'http://proxylab:U7tS9j2Q@us.proxylab.com:8000', 'https': 'http://proxylab:U7tS9j2Q@us.proxylab.com:8000'},
-    {'http': 'http://proxylab:U7tS9j2Q@uk.proxylab.com:8000', 'https': 'http://proxylab:U7tS9j2Q@uk.proxylab.com:8000'},
-    {'http': 'http://proxylab:U7tS9j2Q@de.proxylab.com:8000', 'https': 'http://proxylab:U7tS9j2Q@de.proxylab.com:8000'},
-]
+# Bright Data residential proxy com sessão random (IP muda a cada request)
+BRIGHT_DATA_USERNAME = "customer-your_username_here"
+BRIGHT_DATA_PASSWORD = "your_password_here"
+BRIGHT_DATA_HOST = "brd.superproxy.io:22225"
 
 @app.post("/sync", response_model=SyncResponse)
 async def sync_instagram(request: SyncRequest):
     username = request.username.strip().lstrip('@')
     try:
-        selected_proxy = random.choice(proxies_list)
-        L.context.proxy = selected_proxy
-        logger.info(f"Using proxy: {selected_proxy}")
-        logger.info(f"Syncing public profile: {username} for user {request.user_id}")
+        # Lista de sessões para rotação (pode adicionar mais)
+        sessions = [f"session-{random.randint(10000,99999)}" for _ in range(5)]
+        session = random.choice(sessions)
+        
+        proxy_url = f"http://{BRIGHT_DATA_USERNAME}-{session}-country-pt:{BRIGHT_DATA_PASSWORD}@{BRIGHT_DATA_HOST}"
+        
+        L.context.proxy = {
+            'http': proxy_url,
+            'https': proxy_url,
+        }
+        
+        logger.info(f"Using Bright Data proxy with session: {session}")
+        logger.info(f"Proxy configurado: {L.context.proxy}")
+        logger.info(f"Iniciando sync de @{username} for user {request.user_id}")
 
         profile = instaloader.Profile.from_username(L.context, username)
 
