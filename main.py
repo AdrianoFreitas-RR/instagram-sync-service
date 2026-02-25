@@ -49,7 +49,7 @@ async def sync_instagram(request: SyncRequest):
 
         posts_list = []
         post_count = 0
-        max_posts = 50  # limite para evitar blocks; aumente com cuidado
+        max_posts = 10  # limite para evitar blocks; aumente com cuidado
 
         for post in profile.get_posts():
             if post_count >= max_posts:
