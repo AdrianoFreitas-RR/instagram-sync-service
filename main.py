@@ -19,9 +19,9 @@ class SyncResponse(BaseModel):
     posts: list[dict]
 
 L = instaloader.Instaloader(
-    download_pics=False,
+    download_pictures=False,
     download_videos=False,
-    download_comments=False,  # mude para True se quiser comentários completos (mais requests)
+    download_comments=False,
     save_metadata=False,
     quiet=True
 )
